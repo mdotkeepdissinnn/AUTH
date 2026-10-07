@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ASTRA Auth — Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" media="print" onload="this.media='all'">
+<style>
+:root{--success:#10b981;--error:#ef4444;--warning:#f59e0b;--text-primary:#fff;--text-secondary:#ccc}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#000;color:var(--text-primary);padding:12px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#1a1a1a;border-radius:12px;border:1px solid rgba(255,255,255,.1);margin-bottom:16px}
+.brand-area{display:flex;align-items:center;gap:10px}
+.brand-icon{width:36px;height:36px;background:#333;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px}
+.brand-info h2{font-size:14px}.brand-info .user-tag{font-size:11px;color:var(--text-secondary)}.user-tag strong{color:#999}
+.btn{padding:6px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-size:12px;font-family:inherit}
+.btn-primary{background:#333;color:#fff}.btn-primary:hover{background:#444}
+.btn-secondary{background:transparent;border:1px solid rgba(255,255,255,.2);color:#fff}.btn-secondary:hover{background:#333}
+.btn-danger{background:#2a1a1a;border:1px solid rgba(239,68,68,.3);color:#fca5a5}.btn-danger:hover{background:#3a1a1a}
+.btn-logout{background:#2a1a1a;border:1px solid rgba(239,68,68,.3);color:var(--text-secondary)}.btn-logout:hover{background:#3a1a1a;color:#fca5a5}
+.layout{display:grid;grid-template-columns:200px 1fr;gap:16px}
+.sidebar{background:#1a1a1a;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);height:fit-content;position:sticky;top:12px}
+.nav-item{padding:8px 12px;border-radius:8px;cursor:pointer;margin-bottom:4px;color:var(--text-secondary);font-weight:500;display:flex;align-items:center;gap:8px;font-size:12px;border:1px solid transparent}
+.nav-item:hover{background:#333;color:#fff}
+.nav-item.active{background:#333;color:#fff;border-color:rgba(255,255,255,.2)}
+.sidebar-footer{margin-top:12px;padding-top:8px;border-top:1px solid rgba(255,255,255,.1);font-size:10px;color:var(--text-secondary)}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-size:20px;font-weight:700}
+.card{background:#1a1a1a;padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,.1);margin-bottom:12px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1)}
+.card-title{font-size:14px;font-weight:600}.card-subtitle{font-size:11px;color:var(--text-secondary);margin-top:2px}
+.form-group{margin-bottom:10px}.form-label{display:block;margin-bottom:4px;color:var(--text-secondary);font-size:11px;font-weight:500}
+.form-input,.form-select{width:100%;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:#0a0a0a;color:#fff;font-size:12px;font-family:inherit;outline:none}
+.form-inline{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.key-display{display:inline-flex;align-items:center;gap:8px;background:#0a0a0a;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);font-family:monospace;font-size:11px}
+.key-text{color:#999}.key-btn{padding:4px 8px;border-radius:6px;border:none;background:#333;color:#fff;cursor:pointer;font-size:11px}
+.table-wrapper{overflow-x:auto}.table{width:100%;border-collapse:collapse;font-size:12px}
+.table th{text-align:left;padding:8px;color:var(--text-secondary);border-bottom:1px solid rgba(255,255,255,.1)}
+.table td{padding:8px;border-bottom:1px solid rgba(255,255,255,.05)}.table tr:hover{background:#0a0a0a}
+.badge{display:inline-block;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:600;border:1px solid}
+.badge-success{background:#1a2a1a;color:#6ee7b7;border-color:var(--success)}
+.badge-error{background:#2a1a1a;color:#fca5a5;border-color:var(--error)}
+.badge-warning{background:#2a2a1a;color:#fcd34d;border-color:var(--warning)}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.info-box{background:#0a0a0a;border-left:2px solid var(--text-secondary);padding:10px;border-radius:8px;margin-bottom:12px;font-size:12px;color:var(--text-secondary)}
+.empty-state{text-align:center;padding:30px;color:var(--text-secondary)}
+.hide{display:none!important}
+#login{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:50}
+#login form{background:#1a1a1a;padding:26px;border-radius:12px;border:1px solid rgba(255,255,255,.1);width:300px}
+#login input{width:100%;margin:6px 0;padding:9px;background:#0a0a0a;border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#fff}
+#login button{width:100%;margin-top:8px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{padding:18px;background:#0d0d0d;border:1px solid rgba(255,255,255,.08);border-radius:12px;text-align:center}
+.stat b{font-size:30px;display:block}
+@media(max-width:968px){.layout{grid-template-columns:1fr}.sidebar{position:static}}
+</style>
+</head>
+<body>
+<div id="login"><form onsubmit="return doLogin(event)"><h2>ASTRA Auth</h2><br>
+<input id="lu" placeholder="Admin"><input id="lp" type="password" placeholder="Mot de passe">
+<button class="btn btn-primary" type="submit">Login</button>
+<p id="le" style="color:#fca5a5;font-size:12px"></p></form></div>
+
+<div class="topbar">
+  <div class="brand-area"><div class="brand-icon">V</div>
+    <div class="brand-info"><h2>ASTRA Auth Dashboard</h2><div class="user-tag">Signed in as <strong id="who"></strong> <span id="conn" style="font-size:10px"></span></div></div></div>
+  <div><button class="btn btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
+</div>
+<div id="err" style="display:none;background:#2a1a1a;border:1px solid #ef4444;color:#fca5a5;padding:10px;border-radius:8px;margin-bottom:12px;font-size:12px"></div>
+
+<div class="layout">
+<aside class="sidebar"><nav>
+<div class="nav-item active" data-v="home"><i class="fas fa-home"></i> Home</div>
+<div class="nav-item" data-v="apps"><i class="fas fa-mobile-alt"></i> Applications</div>
+<div class="nav-item" data-v="licenses"><i class="fas fa-key"></i> Licenses</div>
+<div class="nav-item" data-v="users"><i class="fas fa-users"></i> Users</div>
+<div class="nav-item" data-v="settings"><i class="fas fa-cog"></i> Settings</div>
+</nav><div class="sidebar-footer"><strong>Tip:</strong> API client : POST /api/verify (voir README).</div></aside>
+
+<main>
+<section id="v-home">
+<div class="section-header"><h1 class="section-title">Welcome to VGK Auth</h1></div>
+<div class="info-box"><i class="fas fa-info-circle"></i> Cree une application pour obtenir ta cle API, puis genere des licences. Le client C++ appelle <b>POST /api/verify</b>.</div>
+<div class="card"><div class="card-header"><div><div class="card-title">Quick Stats</div></div></div>
+<div class="stats"><div class="stat"><b id="s-apps">0</b>Applications</div><div class="stat"><b id="s-lic">0</b>Licenses</div><div class="stat"><b id="s-usr">0</b>Users</div></div></div>
+</section>
+
+<section id="v-apps" class="hide">
+<div class="section-header"><h1 class="section-title">Applications</h1><button class="btn btn-primary" onclick="showCreate()">+ Create Application</button></div>
+<div class="card hide" id="cf"><div class="card-title">Create New Application</div><br>
+<input id="cn" class="form-input" placeholder="Nom (3-32)" maxlength="32" style="max-width:300px">
+<button class="btn btn-primary" onclick="createApp()">Create</button></div>
+<div id="appList"></div>
+</section>
+
+<section id="v-licenses" class="hide">
+<div class="section-header"><h1 class="section-title">License Management</h1></div>
+<div class="card"><div class="card-title"><i class="fas fa-key"></i> Create New License</div><br>
+<div class="form-inline"><div><label class="form-label">App</label><select id="la" class="form-select"></select></div>
+<div><label class="form-label">Pattern (* = aleatoire)</label><input id="lm" class="form-input" value="****-****-****"></div>
+<div><label class="form-label">Nombre</label><input id="ln" class="form-input" value="1" type="number" min="1" max="500"></div>
+<div><label class="form-label">Expiration</label><select id="le2" class="form-select"><option value="lifetime">Lifetime</option><option value="days">Days</option><option value="weeks">Weeks</option><option value="months">Months</option></select></div>
+<div><label class="form-label">Duree</label><input id="lam" class="form-input" value="30" type="number" min="1"></div></div><br>
+<button class="btn btn-primary" onclick="genLic()">Generate</button>
+<button class="btn btn-secondary" onclick="if(confirm('Reset tous les HWID/IP de cette app ?'))licOp({resetAll:1,appId:la.value})">Reset all HWID</button></div>
+<div id="licList"></div>
+</section>
+
+<section id="v-users" class="hide">
+<div class="section-header"><h1 class="section-title">App Users</h1></div>
+<div class="card"><div class="card-title">Create user</div><br>
+<div class="form-inline"><select id="ua" class="form-select"></select>
+<input id="uu" class="form-input" placeholder="Username"><input id="up" type="password" class="form-input" placeholder="Password 4+"></div><br>
+<button class="btn btn-primary" onclick="addUser()">Create</button></div>
+<div class="card"><div class="table-wrapper"><table class="table"><thead><tr><th>User</th><th>App</th><th></th></tr></thead><tbody id="urows"></tbody></table></div></div>
+</section>
+
+<section id="v-settings" class="hide">
+<div class="section-header"><h1 class="section-title">Settings</h1></div>
+<div class="card"><div class="card-title">Change username / password</div><br>
+<input id="su" class="form-input" placeholder="New username" style="max-width:300px"><br><br>
+<input id="sp" type="password" class="form-input" placeholder="New password 8+" style="max-width:300px"><br><br>
+<input id="sc" type="password" class="form-input" placeholder="Current password" style="max-width:300px"><br><br>
+<button class="btn btn-primary" onclick="saveAcc()">Save</button> <span id="smsg"></span></div>
+</section>
+</main>
+</div>
+
+<script>
+var APPS=[];
+function showErr(m){var e=document.getElementById('err');e.style.display='block';e.textContent='Erreur: '+m+' (serveur lance ? node server.js)';clearTimeout(window._et);window._et=setTimeout(function(){e.style.display='none';},6000);}
+function api(m,p,b){
+  var ctl=new AbortController();var to=setTimeout(function(){ctl.abort();},10000);
+  return fetch('/api/admin?r='+m+(p||''),{method:b?'POST':'GET',headers:{'Content-Type':'application/json'},body:b?JSON.stringify(b):undefined,signal:ctl.signal}).then(function(r){
+    clearTimeout(to);
+    document.getElementById('conn').innerHTML='<span style="color:#6ee7b7">● en ligne</span>';
+    return r.json();
+  }).catch(function(e){
+    clearTimeout(to);
+    document.getElementById('conn').innerHTML='<span style="color:#fca5a5">● hors ligne</span>';
+    showErr(e.name==='AbortError'?'timeout 10s':'serveur injoignable');
+    return {ok:false};
+  });
+}
+function doLogin(e){e.preventDefault();
+  api('login',0,{user:lu.value,pass:lp.value}).then(function(r){
+    if(r.ok){document.getElementById('login').style.display='none';who.textContent=r.user;load();}
+    else le.textContent='Mauvais identifiants';});return false;}
+function logout(){api('logout',0,{}).then(function(){location.reload();});}
+document.querySelectorAll('.nav-item').forEach(function(n){n.onclick=function(){
+  document.querySelectorAll('.nav-item').forEach(function(x){x.classList.remove('active');});
+  n.classList.add('active');
+  ['home','apps','licenses','users','settings'].forEach(function(v){
+    document.getElementById('v-'+v).className=v===n.dataset.v?'':'hide';});
+  if(n.dataset.v==='licenses')loadLic(); if(n.dataset.v==='users')loadUsr();};});
+function appName(id){var a=APPS.find(function(x){return x.id===id;});return a?a.name:id;}
+function load(){api('stats').then(function(s){if(!s.ok){document.getElementById('login').style.display='flex';return;}
+  who.textContent=s.user;s_apps.textContent=s.apps;s_lic.textContent=s.licenses;s_usr.textContent=s.users;});
+  api('apps').then(function(r){APPS=r.apps||[];var h='';
+    APPS.forEach(function(a){h+='<div class="card"><div class="card-header"><div><div class="card-title">'+a.name+'</div><div class="card-subtitle">'+a.licenses+' licenses / '+a.users+' users</div></div><div><span class="badge '+(a.hwidLock?'badge-success':'badge-warning')+'">HWID '+(a.hwidLock?'ON':'OFF')+'</span> <span class="badge '+(a.ipLock?'badge-success':'badge-warning')+'">IP '+(a.ipLock?'ON':'OFF')+'</span></div></div>'
+    +'<div class="key-display"><span class="key-text">'+a.apiKey+'</span><button class="key-btn" onclick="navigator.clipboard.writeText(\''+a.apiKey+'\')">Copy</button></div><br><br><div class="actions">'
+    +'<button class="btn btn-secondary" onclick="tgl(\''+a.id+'\',\'hwid\')">HWID lock</button>'
+    +'<button class="btn btn-secondary" onclick="tgl(\''+a.id+'\',\'ip\')">IP lock</button>'
+    +'<button class="btn btn-secondary" onclick="ren(\''+a.id+'\')">Rename</button>'
+    +'<button class="btn btn-danger" onclick="delA(\''+a.id+'\')">Delete</button></div></div>';});
+    appList.innerHTML=h||'<div class="card">No app yet</div>';
+    var o='';APPS.forEach(function(a){o+='<option value="'+a.id+'">'+a.name+'</option>';});
+    la.innerHTML=o;ua.innerHTML=o;});}
+function showCreate(){cf.classList.remove('hide');}
+function createApp(){var n=cn.value.trim();if(n.length<3)return;api('apps',0,{name:n}).then(function(){cn.value='';cf.classList.add('hide');load();});}
+function delA(id){if(confirm('Delete app + licenses + users ?'))api('apps',0,{del:id}).then(load);}
+function ren(id){var n=prompt('New name:');if(n)api('apps',0,{rename:n,id:id}).then(load);}
+function tgl(id,w){var b={id:id};if(w==='hwid')b.toggleHwid=1;else b.toggleIp=1;api('apps',0,b).then(load);}
+function loadLic(){var aid=la.value;
+  api('licenses',aid?'&app='+aid:'').then(function(r){var h='';
+    r.licenses.forEach(function(k){var st=k.banned?'<span class="badge badge-error">BAN</span>':(k.expiresAt&&k.expiresAt*1000<Date.now()?'<span class="badge badge-error">EXP</span>':'<span class="badge badge-success">OK</span>');
+    h+='<tr><td><code>'+k.key+'</code></td><td>'+(k.expiresAt?new Date(k.expiresAt*1000).toLocaleDateString():'life')+'</td><td>'+(k.hwid||'-').slice(0,16)+'</td><td>'+(k.ip||'-')+'</td><td>'+st+'</td><td><div class="actions"><button class="btn btn-secondary" onclick="licOp({ban:\''+k.id+'\'})">ban</button><button class="btn btn-secondary" onclick="licOp({resetHwid:\''+k.id+'\'})">hwid</button><button class="btn btn-danger" onclick="licOp({del:\''+k.id+'\'})">X</button></div></td></tr>';});
+    licList.innerHTML='<div class="card"><div class="table-wrapper"><table class="table"><thead><tr><th>Key</th><th>Expire</th><th>HWID</th><th>IP</th><th>Etat</th><th></th></tr></thead><tbody>'+(h||'<tr><td colspan=6>No licenses</td></tr>')+'</tbody></table></div></div>';});}
+function licOp(b){api('licenses',0,b).then(loadLic);}
+function genLic(){api('licenses',0,{gen:1,appId:la.value,mask:lm.value,count:ln.value,expiry:le2.value,amount:lam.value}).then(loadLic);}
+function loadUsr(){var aid=ua.value;
+  api('users',aid?'&app='+aid:'').then(function(r){var h='';
+    r.users.forEach(function(u){h+='<tr><td>'+u.user+'</td><td>'+appName(u.appId)+'</td><td><button class="btn btn-danger" onclick="api(\'users\',0,{del:\''+u.id+'\'}).then(loadUsr)">X</button></td></tr>';});
+    urows.innerHTML=h||'<tr><td colspan=3>No users</td></tr>';});}
+function addUser(){api('users',0,{appId:ua.value,user:uu.value,pass:up.value}).then(function(){uu.value='';up.value='';loadUsr();});}
+function saveAcc(){api('account',0,{username:su.value,newpass:sp.value,cur:sc.value}).then(function(r){smsg.textContent=r.ok?'Saved':'Bad password';});}
+load();
+</script>
+</body>
+</html>
