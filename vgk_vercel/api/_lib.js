@@ -1,5 +1,9 @@
-const { kv } = require('@vercel/kv');
+const { Redis } = require('@upstash/redis');
 const crypto = require('crypto');
+const kv = new Redis({
+  url: process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 const SECRET = process.env.HMAC_SECRET || 'vgk_hmac_9xK!2pLm#8qRz$wNv'; // = VGK_HMAC_SECRET du .cpp
 const hmac = (d) => crypto.createHmac('sha256', SECRET).update(d).digest('hex');
 function rnd(n) {
